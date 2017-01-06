@@ -1,0 +1,10 @@
+#include "kmp.h"
+
+int Kmp::Search(const char* text, const char* pattern) const
+{
+	int i, j;
+	int textLen = strlen(text);
+	int patLen = strlen(patter
+	for(i = 0; i < 
+	return -1;
+}
