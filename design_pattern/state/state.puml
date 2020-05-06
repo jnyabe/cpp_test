@@ -1,0 +1,14 @@
+@startuml
+State <|- Created
+State <|- Started
+State <|- Downloading
+State <|- PreProcess
+State <|- ImageWriting
+State <|- WaitingForEula
+State <|- WaitingForUpdate
+State <|- WaitingForUpdateMode
+
+State <|- WaitingForVerify
+State <|- WaitingForBankSwitch
+
+@enduml
