@@ -1,9 +1,14 @@
 #include <stdio.h>
-#include "context.h"
+#include "state_context.h"
 
 int main(int argc, const char* argv[])
 {
-	Context context;
-	context.Run();
+	StateContext sc;
+	sc.writeName("Monday");
+	sc.writeName("Tuesday");
+	sc.writeName("Wednesday");
+	sc.writeName("Thursday");
+	sc.writeName("Saturday");
+	sc.writeName("Sunday");
 	return 0;
 }
