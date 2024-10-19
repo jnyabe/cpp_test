@@ -9,66 +9,60 @@ Mutex::Mutex(const char* name, Option option)
 
 #ifdef USE_PTHREAD
 	pthread_mutexattr_t attr;
-  
-	ret = pthread_mutexattr_init(&attr);
-	assert(ret==0);
-  
-	ret = pthread_mutex_init(&m_mutex, &attr);
+	ret = COMMON_ERROR_ERRNO(pthread_mutexattr_init(&attr));
+	if(ret < 0)
+	{
+		ERRPRT("");
+	}
+	
+	ret = COMMON_ERROR_ERRNO(pthread_mutex_init(&m_mutex, &attr));
 	assert(ret==0);
   
 	if(option & Option_Recursvie)
     {
-		ret = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		ret = COMMON_ERROR_ERRNO(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE));
 		assert(ret==0);
     }
   
-	ret = pthread_mutexattr_destroy(&attr);
+	ret = COMMON_ERROR_ERRNO(pthread_mutexattr_destroy(&attr));
 	assert(ret==0);
 #else
 #error
 #endif
-  
+	return ret;
 }
 
 Mutex::~Mutex()
 {
 	int32_t ret = 0;
 #ifdef USE_PTHREAD
-	ret = pthread_mutex_destroy(&m_mutex);
+	Unlock();
+	ret = COMMON_ERROR_ERRNO(pthread_mutex_destroy(&m_mutex));
 	assert(ret==0);
 #else
 #error
-#endif  
+#endif
 }
 
 int32_t Mutex::Lock(void)
 {
 	int32_t ret = 0;
 #ifdef USE_PTHREAD
-	ret = pthread_mutex_lock(&m_mutex);
+	ret = COMMON_ERROR_ERRNO(pthread_mutex_lock(&m_mutex));
+	assert(ret==0);
 #else
 #error
 #endif  
 	return ret;
 }
 
-int32_t Mutex::TimedLock(uint32_t usec)
-{
-	int32_t ret = 0;
-#ifdef USE_PTHREAD
-	// TBD
-	assert(ret==0);
-#else
-#error
-#endif  
-	return ret;  
-}
 
 int32_t Mutex::TryLock(void)
 {
 	int32_t ret = 0;
 #ifdef USE_PTHREAD
-	ret = pthread_mutex_trylock(&m_mutex);
+	ret = COMMON_ERROR_ERRNO(pthread_mutex_trylock(&m_mutex));
+	assert(ret==0);
 #else
 #error
 #endif  
@@ -79,7 +73,7 @@ int32_t Mutex::Unlock(void)
 {
     int32_t ret = 0;
 #ifdef USE_PTHREAD
-    ret = pthread_mutex_unlock(&m_mutex);
+    ret = COMMON_ERROR_ERRNO(pthread_mutex_unlock(&m_mutex));
     assert(ret==0);
 #else
 #error

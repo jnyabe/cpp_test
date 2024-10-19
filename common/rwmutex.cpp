@@ -1,28 +1,27 @@
 #include <assert.h>
-#include "mutex.h"
+#include "rwmutex.h"
 
 using namespace common;
 
-Mutex::Mutex(const char* name, Option option)
+RwMutex::RwMutex(const char* name, Option option)
 {
   int32_t ret = 0;
   
 #ifdef USE_PTHREAD
-  pthread_mutexattr_t attr;
-  
-  ret = pthread_mutexattr_init(&attr);
+  pthread_rwlockattr_t attr;
+  ret = pthread_rwlockattr_init(&attr);
   assert(ret==0);
   
-  ret = pthread_mutex_init(&m_mutex, &attr);
+  ret = pthread_rwlock_init(&m_mutex, &attr);
   assert(ret==0);
-  
+#if 0
   if(option & Option_Recursvie)
-    {
-      ret = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+  {
+	  ret = pthread_rwlockattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
       assert(ret==0);
-    }
-  
-  ret = pthread_mutexattr_destroy(&attr);
+  }
+#endif  
+  ret = pthread_rwlockattr_destroy(&attr);
   assert(ret==0);
 #else
 #error
@@ -30,62 +29,74 @@ Mutex::Mutex(const char* name, Option option)
   
 }
 
-Mutex::~Mutex()
+RwMutex::~RwMutex()
 {
   int32_t ret = 0;
 #ifdef USE_PTHREAD
-  ret = pthread_mutex_destroy(&m_mutex);
+  ret = pthread_rwlock_destroy(&m_mutex);
   assert(ret==0);
 #else
 #error
 #endif  
 }
 
-int32_t Mutex::Lock(void)
+int32_t RwMutex::RdLock(void)
 {
   int32_t ret = 0;
 #ifdef USE_PTHREAD
-  ret = pthread_mutex_lock(&m_mutex);
+  ret = pthread_rwlock_rdlock(&m_mutex);
 #else
 #error
 #endif  
   return ret;
 }
 
-int32_t Mutex::TimedLock(uint32_t usec)
+int32_t RwMutex::WrLock(void)
 {
   int32_t ret = 0;
 #ifdef USE_PTHREAD
-  // TBD
-  assert(ret==0);
+  ret = pthread_rwlock_rdlock(&m_mutex);
+#else
+#error
+#endif  
+  return ret;
+}
+
+
+int32_t RwMutex::TryRdLock(void)
+{
+  int32_t ret = 0;
+#ifdef USE_PTHREAD
+  ret = pthread_rwlock_tryrdlock(&m_mutex);
 #else
 #error
 #endif  
   return ret;  
 }
 
-int32_t Mutex::TryLock(void)
+int32_t RwMutex::TryWrLock(void)
 {
   int32_t ret = 0;
 #ifdef USE_PTHREAD
-  ret = pthread_mutex_trylock(&m_mutex);
+  ret = pthread_rwlock_trywrlock(&m_mutex);
 #else
 #error
 #endif  
   return ret;  
 }
 
-int32_t Mutex::Unlock(void)
+int32_t RwMutex::Unlock(void)
 {
     int32_t ret = 0;
 #ifdef USE_PTHREAD
-    ret = pthread_mutex_unlock(&m_mutex);
+    ret = pthread_rwlock_unlock(&m_mutex);
     assert(ret==0);
 #else
 #error
 #endif  
     return ret;
 }
+
 
 
 

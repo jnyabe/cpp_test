@@ -12,7 +12,7 @@ class Cond
  private:
 
 #ifdef USE_PTHREAD
-  pthread_cond_t m_mutex;
+	pthread_cond_t m_con;
 #endif /* USE_PTHREAD */
 
  public:
